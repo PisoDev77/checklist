@@ -3,12 +3,13 @@ const CheckItem = require('../models/CheckItem');
 // 새로운 체크 아이템 생성
 exports.createCheckItem = async (req, res) => {
   try {
-    const { text, priority, category, description } = req.body;
+    const { text, priority, category, description, addDate } = req.body;
     const checkItem = new CheckItem({
       text,
       priority,
       category,
       description,
+      addDate: new Date(addDate), // 명시적으로 Date 객체로 변환
     });
     const savedItem = await checkItem.save();
     res.status(201).json(savedItem);
@@ -20,9 +21,54 @@ exports.createCheckItem = async (req, res) => {
 // 모든 체크 아이템 조회
 exports.getCheckItems = async (req, res) => {
   try {
-    const checkItems = await CheckItem.find().sort({ recentUpdateDate: -1 });
+    const { date } = req.query;
+    console.log('Received date query:', date);
+
+    let query = {};
+    if (date) {
+      // 선택된 날짜의 시작과 끝 (한국 시간 기준)
+      const startDate = new Date(date);
+      startDate.setHours(0, 0, 0, 0);
+
+      const endDate = new Date(date);
+      endDate.setHours(23, 59, 59, 999);
+
+      query = {
+        addDate: {
+          $gte: startDate,
+          $lte: endDate,
+        },
+      };
+
+      console.log('Date filter query:', {
+        date,
+        startDateISO: startDate.toISOString(),
+        endDateISO: endDate.toISOString(),
+        startDate,
+        endDate,
+      });
+    }
+
+    // 실제 쿼리 실행 전 로그
+    console.log('MongoDB query:', JSON.stringify(query));
+
+    const checkItems = await CheckItem.find(query).sort({ addDate: -1 });
+
+    // 각 아이템의 addDate 확인
+    console.log(
+      'Found items with dates:',
+      checkItems.map((item) => ({
+        id: item._id,
+        addDate: item.addDate,
+        addDateISO: item.addDate.toISOString(),
+      })),
+    );
+
+    console.log('Total items found:', checkItems.length);
+
     res.json(checkItems);
   } catch (error) {
+    console.error('Error in getCheckItems:', error);
     res.status(500).json({ message: error.message });
   }
 };

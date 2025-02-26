@@ -10,15 +10,18 @@ export default function Home() {
   const [newItemText, setNewItemText] = useState('');
   const [newItemCategory, setNewItemCategory] = useState('general');
   const [newItemPriority, setNewItemPriority] = useState('medium');
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toISOString().split('T')[0],
+  );
 
   useEffect(() => {
     fetchItems();
-  }, []);
+  }, [selectedDate]);
 
   const fetchItems = async () => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/checkItems`,
+        `${process.env.NEXT_PUBLIC_API_URL}/checkItems?date=${selectedDate}`,
       );
       setItems(response.data);
     } catch (error) {
@@ -31,6 +34,7 @@ export default function Home() {
   const handleAddItem = async (e) => {
     e.preventDefault();
     try {
+      const now = new Date().toISOString();
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/checkItems`,
         {
@@ -42,6 +46,9 @@ export default function Home() {
             text: newItemText,
             category: newItemCategory,
             priority: newItemPriority,
+            addDate: now,
+            updateDateLog: [],
+            recentUpdateDate: now,
           }),
         },
       );
@@ -64,9 +71,16 @@ export default function Home() {
 
   const handleUpdateItem = async (updatedItem) => {
     try {
+      const currentDate = new Date().toISOString();
+      const itemToUpdate = {
+        ...updatedItem,
+        updateDateLog: [...(updatedItem.updateDateLog || []), currentDate],
+        recentUpdateDate: currentDate,
+      };
+
       await axios.put(
         `${process.env.NEXT_PUBLIC_API_URL}/checkItems/${updatedItem._id}`,
-        updatedItem,
+        itemToUpdate,
       );
       fetchItems();
     } catch (error) {
@@ -109,7 +123,28 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-green-50 p-8">
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8 text-green-800">체크리스트</h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-green-800">체크리스트</h1>
+          <div className="flex items-center gap-2">
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => {
+                console.log('Date changed to:', e.target.value);
+                setSelectedDate(e.target.value);
+              }}
+              className="p-2 border border-green-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-green-800"
+            />
+            <button
+              onClick={() =>
+                setSelectedDate(new Date().toISOString().split('T')[0])
+              }
+              className="px-4 py-2 bg-green-100 text-green-800 rounded-lg hover:bg-green-200 transition duration-300"
+            >
+              오늘
+            </button>
+          </div>
+        </div>
 
         <form onSubmit={handleAddItem} className="mb-8">
           <div className="flex items-center gap-2">
@@ -150,37 +185,46 @@ export default function Home() {
           {items.length === 0 ? (
             <div className="text-center py-10 bg-primary-50 rounded-lg text-green-800">
               <p className="text-primary-800 text-lg mb-4">
-                아직 체크리스트가 없습니다
+                {selectedDate === new Date().toISOString().split('T')[0]
+                  ? '오늘의 체크리스트가 없습니다'
+                  : '선택한 날짜의 체크리스트가 없습니다'}
               </p>
               <p className="text-primary-600">
                 위 폼을 통해 새로운 할 일을 추가해보세요!
               </p>
             </div>
           ) : (
-            Object.entries(groupItemsByDate(items))
-              .sort((a, b) => new Date(b[0]) - new Date(a[0]))
-              .map(([date, dateItems]) => (
-                <div key={date} className="mb-8">
-                  <h2 className="text-lg font-semibold mb-4 text-primary-800 border-b border-primary-200 pb-2">
-                    {new Date(date).toLocaleDateString('ko-KR', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                      weekday: 'long',
-                    })}
-                  </h2>
-                  <div className="space-y-2">
-                    {dateItems.map((item) => (
-                      <CheckListItem
-                        key={item._id}
-                        item={item}
-                        onUpdate={handleUpdateItem}
-                        onDelete={handleDeleteItem}
-                      />
-                    ))}
+            <div className="space-y-2">
+              {items.map((item) => (
+                <div key={item._id} className="flex flex-col gap-1">
+                  <CheckListItem
+                    key={item._id}
+                    item={item}
+                    onUpdate={handleUpdateItem}
+                    onDelete={handleDeleteItem}
+                  />
+                  <div className="text-xs text-gray-500 ml-2">
+                    <span>
+                      등록:{' '}
+                      {item.addDate
+                        ? new Date(item.addDate).toLocaleString('ko-KR')
+                        : '날짜 정보 없음'}
+                    </span>
+                    {item.recentUpdateDate &&
+                      new Date(item.recentUpdateDate).toLocaleString(
+                        'ko-KR',
+                      ) !== new Date(item.addDate).toLocaleString('ko-KR') && (
+                        <span className="ml-4">
+                          최근 수정:{' '}
+                          {new Date(item.recentUpdateDate).toLocaleString(
+                            'ko-KR',
+                          )}
+                        </span>
+                      )}
                   </div>
                 </div>
-              ))
+              ))}
+            </div>
           )}
         </div>
       </div>
