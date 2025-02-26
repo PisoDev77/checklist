@@ -16,7 +16,7 @@ router.post('/', async (req, res) => {
       text,
       category,
       priority,
-      completed: false,
+      isCompleted: false,
       description: '', // 기본값 추가
     });
 
@@ -24,12 +24,10 @@ router.post('/', async (req, res) => {
     res.status(201).json(savedItem);
   } catch (error) {
     console.error('Error creating check item:', error);
-    res
-      .status(500)
-      .json({
-        message: '아이템 생성 중 오류가 발생했습니다',
-        error: error.message,
-      });
+    res.status(500).json({
+      message: '아이템 생성 중 오류가 발생했습니다',
+      error: error.message,
+    });
   }
 });
 
@@ -37,10 +35,10 @@ router.get('/', checkItemController.getCheckItems);
 router.get('/:id', checkItemController.getCheckItem);
 router.put('/:id', async (req, res) => {
   try {
-    const { text, completed, category, priority } = req.body;
+    const { text, isCompleted, category, priority } = req.body;
     const updatedItem = await CheckItem.findByIdAndUpdate(
       req.params.id,
-      { text, completed, category, priority },
+      { text, isCompleted, category, priority },
       { new: true },
     );
     res.json(updatedItem);
