@@ -4,28 +4,29 @@ import { BiCategory } from 'react-icons/bi';
 
 const CheckListItem = ({ item, onUpdate, onDelete }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [editedTitle, setEditedTitle] = useState(item.title);
+  const [editedText, setEditedText] = useState(item.text);
+  const [category, setCategory] = useState(item.category || '');
+  const [priority, setPriority] = useState(item.priority || 'medium');
 
-  const handleCheck = async () => {
-    onUpdate(item._id, { checked: !item.checked });
-  };
-
-  const handleEdit = async () => {
-    if (isEditing) {
-      await onUpdate(item._id, { title: editedTitle });
-    }
-    setIsEditing(!isEditing);
+  const handleUpdate = () => {
+    onUpdate({
+      ...item,
+      text: editedText,
+      category: category,
+      priority: priority,
+    });
+    setIsEditing(false);
   };
 
   const priorityConfig = {
     high: {
-      color: 'text-red-600',
-      bg: 'bg-red-50',
+      color: 'text-green-800',
+      bg: 'bg-green-100',
       label: '높음',
     },
     medium: {
-      color: 'text-yellow-600',
-      bg: 'bg-yellow-50',
+      color: 'text-green-700',
+      bg: 'bg-green-50',
       label: '중간',
     },
     low: {
@@ -36,40 +37,76 @@ const CheckListItem = ({ item, onUpdate, onDelete }) => {
   };
 
   return (
-    <div className="flex flex-col p-4 border rounded-lg mb-2 hover:bg-green-50">
+    <div className="flex flex-col p-4 border border-green-200 rounded-lg mb-2 hover:bg-green-50">
       <div className="flex items-center">
         <input
           type="checkbox"
-          checked={item.checked}
-          onChange={handleCheck}
+          checked={item.completed}
+          onChange={() => onUpdate({ ...item, completed: !item.completed })}
           className="h-5 w-5 accent-green-600 rounded border-green-300"
         />
         <span
           className={`ml-3 flex-1 ${
-            item.checked ? 'line-through text-green-400' : 'text-green-800'
+            item.completed ? 'line-through text-green-400' : 'text-green-800'
           }`}
         >
           {isEditing ? (
-            <input
-              type="text"
-              value={editedTitle}
-              onChange={(e) => setEditedTitle(e.target.value)}
-              className="border border-green-300 p-1 rounded w-full focus:outline-none focus:ring-2 focus:ring-green-500"
-            />
+            <div className="flex items-center gap-2 flex-grow">
+              <input
+                type="text"
+                value={editedText}
+                onChange={(e) => setEditedText(e.target.value)}
+                className="flex-grow border border-green-200 p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="w-24 border border-green-200 p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                <option value="general">일반</option>
+                <option value="others">기타</option>
+              </select>
+              <select
+                value={priority}
+                onChange={(e) => setPriority(e.target.value)}
+                className="w-20 border border-green-200 p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                <option value="high">높음</option>
+                <option value="medium">중간</option>
+                <option value="low">낮음</option>
+              </select>
+              <button
+                onClick={handleUpdate}
+                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition-colors"
+              >
+                저장
+              </button>
+            </div>
           ) : (
-            item.title
+            <div className="flex flex-grow items-center gap-4">
+              <span
+                className={`text-green-900 ${
+                  item.completed ? 'line-through text-green-600' : ''
+                }`}
+              >
+                {item.text}
+              </span>
+              <span className="text-sm bg-green-50 text-green-800 px-3 py-1 rounded-full border border-green-200">
+                {category || '카테고리 없음'}
+              </span>
+              <button
+                onClick={() => setIsEditing(true)}
+                className="text-green-700 hover:text-green-800 hover:bg-green-100 px-3 py-1 rounded-md transition-colors"
+              >
+                수정
+              </button>
+            </div>
           )}
         </span>
         <div className="flex gap-2">
           <button
-            onClick={handleEdit}
-            className="text-green-600 hover:text-green-800 px-3 py-1 rounded-md hover:bg-green-100"
-          >
-            {isEditing ? '저장' : '수정'}
-          </button>
-          <button
             onClick={() => onDelete(item._id)}
-            className="text-green-600 hover:text-green-800 px-3 py-1 rounded-md hover:bg-green-100"
+            className="ml-auto text-green-700 hover:text-green-800 hover:bg-green-100 px-3 py-1 rounded-md transition-colors"
           >
             삭제
           </button>
@@ -82,18 +119,16 @@ const CheckListItem = ({ item, onUpdate, onDelete }) => {
 
       <div className="mt-3 ml-8 flex items-center gap-4 text-sm">
         <div
-          className={`flex items-center gap-1 px-2 py-1 rounded-full ${
-            priorityConfig[item.priority].bg
-          }`}
+          className={`flex items-center gap-1 px-3 py-1 rounded-full border border-green-200 ${priorityConfig[priority].bg}`}
         >
-          <BsFlagFill className={`${priorityConfig[item.priority].color}`} />
-          <span className={`${priorityConfig[item.priority].color}`}>
-            {priorityConfig[item.priority].label}
+          <BsFlagFill className={`${priorityConfig[priority].color}`} />
+          <span className={`${priorityConfig[priority].color} font-medium`}>
+            {priorityConfig[priority].label}
           </span>
         </div>
-        <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-green-50 text-green-600">
-          <BiCategory />
-          <span>{item.category}</span>
+        <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-green-50 text-green-800 border border-green-200">
+          <BiCategory className="text-green-700" />
+          <span className="font-medium">{category || '카테고리 없음'}</span>
         </div>
       </div>
     </div>

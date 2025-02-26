@@ -3,13 +3,13 @@ const CheckItem = require('../models/CheckItem');
 // 새로운 체크 아이템 생성
 exports.createCheckItem = async (req, res) => {
   try {
+    const { text, priority, category, description } = req.body;
     const checkItem = new CheckItem({
-      title: req.body.title,
-      description: req.body.description,
-      priority: req.body.priority,
-      category: req.body.category,
+      text,
+      priority,
+      category,
+      description,
     });
-
     const savedItem = await checkItem.save();
     res.status(201).json(savedItem);
   } catch (error) {
@@ -53,10 +53,10 @@ exports.updateCheckItem = async (req, res) => {
     }
 
     // 업데이트할 필드들을 설정
-    if (req.body.title) checkItem.title = req.body.title;
+    if (req.body.text) checkItem.text = req.body.text;
     if (req.body.description) checkItem.description = req.body.description;
-    if (typeof req.body.checked === 'boolean')
-      checkItem.checked = req.body.checked;
+    if (typeof req.body.completed === 'boolean')
+      checkItem.completed = req.body.completed;
     if (req.body.priority) checkItem.priority = req.body.priority;
     if (req.body.category) checkItem.category = req.body.category;
 

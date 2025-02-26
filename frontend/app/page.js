@@ -7,12 +7,9 @@ import CheckListItem from '../components/CheckListItem';
 export default function Home() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [newItem, setNewItem] = useState({
-    title: '',
-    description: '',
-    priority: 'medium',
-    category: 'general',
-  });
+  const [newItemText, setNewItemText] = useState('');
+  const [newItemCategory, setNewItemCategory] = useState('general');
+  const [newItemPriority, setNewItemPriority] = useState('medium');
 
   useEffect(() => {
     fetchItems();
@@ -31,30 +28,45 @@ export default function Home() {
     }
   };
 
-  const createItem = async (e) => {
+  const handleAddItem = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(
+      const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/checkItems`,
-        newItem,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            text: newItemText,
+            category: newItemCategory,
+            priority: newItemPriority,
+          }),
+        },
       );
-      setNewItem({
-        title: '',
-        description: '',
-        priority: 'medium',
-        category: 'general',
-      });
+
+      if (!response.ok) {
+        throw new Error('아이템 생성에 실패했습니다');
+      }
+
+      const createdItem = await response.json();
+      setItems([...items, createdItem]);
+      setNewItemText('');
+      setNewItemCategory('general');
+      setNewItemPriority('medium');
       fetchItems();
     } catch (error) {
-      console.error('체크리스트 아이템 생성 실패:', error);
+      console.error('Error adding item:', error);
+      alert('아이템 생성에 실패했습니다');
     }
   };
 
-  const updateItem = async (id, updates) => {
+  const handleUpdateItem = async (updatedItem) => {
     try {
       await axios.put(
-        `${process.env.NEXT_PUBLIC_API_URL}/checkItems/${id}`,
-        updates,
+        `${process.env.NEXT_PUBLIC_API_URL}/checkItems/${updatedItem._id}`,
+        updatedItem,
       );
       fetchItems();
     } catch (error) {
@@ -62,7 +74,7 @@ export default function Home() {
     }
   };
 
-  const deleteItem = async (id) => {
+  const handleDeleteItem = async (id) => {
     try {
       await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/checkItems/${id}`);
       fetchItems();
@@ -99,19 +111,44 @@ export default function Home() {
       <div className="max-w-2xl mx-auto">
         <h1 className="text-3xl font-bold mb-8 text-green-800">체크리스트</h1>
 
-        <form onSubmit={createItem} className="mb-8">
-          <input
-            type="text"
-            value={newItem.title}
-            onChange={(e) => setNewItem({ ...newItem, title: e.target.value })}
-            className="w-full p-2 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-            placeholder="새로운 항목 추가"
-          />
+        <form onSubmit={handleAddItem} className="mb-8">
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              value={newItemText}
+              onChange={(e) => setNewItemText(e.target.value)}
+              placeholder="새로운 할 일을 입력하세요"
+              className="flex-grow p-3 border border-green-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-green-800 font-bold shadow-sm"
+            />
+            <select
+              value={newItemCategory}
+              onChange={(e) => setNewItemCategory(e.target.value)}
+              className="w-32 p-3 border border-green-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-green-800 font-bold shadow-sm"
+            >
+              <option value="general">일반</option>
+              <option value="others">기타</option>
+            </select>
+            <select
+              value={newItemPriority}
+              onChange={(e) => setNewItemPriority(e.target.value)}
+              className="w-28 p-3 border border-green-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-green-800 font-bold shadow-sm"
+            >
+              <option value="high">높음</option>
+              <option value="medium">중간</option>
+              <option value="low">낮음</option>
+            </select>
+            <button
+              type="submit"
+              className="px-6 py-3 bg-green-500 text-white rounded-lg font-bold hover:bg-green-600 transition duration-300"
+            >
+              추가
+            </button>
+          </div>
         </form>
 
         <div>
           {items.length === 0 ? (
-            <div className="text-center py-10 bg-primary-50 rounded-lg">
+            <div className="text-center py-10 bg-primary-50 rounded-lg text-green-800">
               <p className="text-primary-800 text-lg mb-4">
                 아직 체크리스트가 없습니다
               </p>
@@ -137,8 +174,8 @@ export default function Home() {
                       <CheckListItem
                         key={item._id}
                         item={item}
-                        onUpdate={updateItem}
-                        onDelete={deleteItem}
+                        onUpdate={handleUpdateItem}
+                        onDelete={handleDeleteItem}
                       />
                     ))}
                   </div>
