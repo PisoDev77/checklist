@@ -41,13 +41,13 @@ const CheckListItem = ({ item, onUpdate, onDelete }) => {
       <div className="flex items-center">
         <input
           type="checkbox"
-          checked={item.completed}
-          onChange={() => onUpdate({ ...item, completed: !item.completed })}
+          checked={item.isCompleted}
+          onChange={() => onUpdate({ ...item, isCompleted: !item.isCompleted })}
           className="h-5 w-5 accent-green-600 rounded border-green-300"
         />
         <span
           className={`ml-3 flex-1 ${
-            item.completed ? 'line-through text-green-400' : 'text-green-800'
+            item.isCompleted ? 'line-through text-green-400' : 'text-green-800'
           }`}
         >
           {isEditing ? (
@@ -86,7 +86,7 @@ const CheckListItem = ({ item, onUpdate, onDelete }) => {
             <div className="flex flex-grow items-center gap-4">
               <span
                 className={`text-green-900 ${
-                  item.completed ? 'line-through text-green-600' : ''
+                  item.isCompleted ? 'line-through text-green-600' : ''
                 }`}
               >
                 {item.text}

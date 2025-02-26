@@ -101,8 +101,8 @@ exports.updateCheckItem = async (req, res) => {
     // 업데이트할 필드들을 설정
     if (req.body.text) checkItem.text = req.body.text;
     if (req.body.description) checkItem.description = req.body.description;
-    if (typeof req.body.completed === 'boolean')
-      checkItem.completed = req.body.completed;
+    if (typeof req.body.isCompleted === 'boolean')
+      checkItem.isCompleted = req.body.isCompleted;
     if (req.body.priority) checkItem.priority = req.body.priority;
     if (req.body.category) checkItem.category = req.body.category;
 
