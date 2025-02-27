@@ -121,9 +121,9 @@ export default function Home() {
     );
 
   return (
-    <main className="min-h-screen bg-green-50 p-8">
+    <main className="min-h-screen bg-green-100 p-8">
       <div className="max-w-2xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-col md:flex-row justify-between mb-8">
           <h1 className="text-3xl font-bold text-green-800">체크리스트</h1>
           <div className="flex items-center gap-2">
             <input
@@ -139,7 +139,7 @@ export default function Home() {
               onClick={() =>
                 setSelectedDate(new Date().toISOString().split('T')[0])
               }
-              className="px-4 py-2 bg-green-100 text-green-800 rounded-lg hover:bg-green-200 transition duration-300"
+              className="px-4 py-2 bg-green-300 text-green-800 rounded-lg hover:bg-green-500 transition duration-300"
             >
               오늘
             </button>
