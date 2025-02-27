@@ -115,7 +115,7 @@ export default function Home() {
       <div className="flex justify-center items-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mb-4"></div>
-          <p className="text-gray-600">체크리스트를 불러오는 중...</p>
+          <p className="text-gray-600">Loading CheckList...</p>
         </div>
       </div>
     );
@@ -123,9 +123,9 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-green-100 p-8">
       <div className="max-w-2xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between mb-8">
-          <h1 className="text-3xl font-bold text-green-800">체크리스트</h1>
-          <div className="flex items-center gap-2">
+        <header className="flex flex-col md:flex-row justify-between mb-8">
+          <h1 className="text-3xl font-bold text-green-800">CheckList</h1>
+          <section className="flex items-center gap-2">
             <input
               type="date"
               value={selectedDate}
@@ -143,18 +143,11 @@ export default function Home() {
             >
               오늘
             </button>
-          </div>
-        </div>
+          </section>
+        </header>
 
         <form onSubmit={handleAddItem} className="mb-8">
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              value={newItemText}
-              onChange={(e) => setNewItemText(e.target.value)}
-              placeholder="새로운 할 일을 입력하세요"
-              className="flex-grow p-3 border border-green-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-green-800 font-bold shadow-sm"
-            />
+          <div className="flex flex-col md:flex-row gap-2">
             <select
               value={newItemCategory}
               onChange={(e) => setNewItemCategory(e.target.value)}
@@ -172,6 +165,13 @@ export default function Home() {
               <option value="medium">중간</option>
               <option value="low">낮음</option>
             </select>
+            <input
+              type="text"
+              value={newItemText}
+              onChange={(e) => setNewItemText(e.target.value)}
+              placeholder="새로운 할 일을 입력하세요"
+              className="flex-grow p-3 border border-green-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-green-800 font-bold shadow-sm"
+            />
             <button
               type="submit"
               className="px-6 py-3 bg-green-500 text-white rounded-lg font-bold hover:bg-green-600 transition duration-300"

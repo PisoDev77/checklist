@@ -52,13 +52,13 @@ const CheckListItem = ({ item, onUpdate, onDelete }) => {
                 type="text"
                 value={editedText}
                 onChange={(e) => setEditedText(e.target.value)}
-                className="w-full border border-green-200 p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full border border-green-200 p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-500 text-green-800"
               />
               <div className="flex flex-col sm:flex-row gap-2 w-full">
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="border border-green-200 p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="border border-green-200 p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-500 text-green-800"
                 >
                   <option value="general">일반</option>
                   <option value="others">기타</option>
@@ -66,7 +66,7 @@ const CheckListItem = ({ item, onUpdate, onDelete }) => {
                 <select
                   value={priority}
                   onChange={(e) => setPriority(e.target.value)}
-                  className="border border-green-200 p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="border border-green-200 p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-500 text-green-800"
                 >
                   <option value="high">높음</option>
                   <option value="medium">중간</option>
@@ -91,7 +91,7 @@ const CheckListItem = ({ item, onUpdate, onDelete }) => {
               >
                 {item.text}
               </span>
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+              <div className="flex flex-row items-start sm:items-center gap-2">
                 <span className="inline-flex text-sm bg-green-50 text-green-800 px-3 py-1 rounded-full border border-green-200">
                   {category || '카테고리 없음'}
                 </span>
@@ -111,7 +111,7 @@ const CheckListItem = ({ item, onUpdate, onDelete }) => {
             </div>
           )}
 
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+          <div className="flex flex-row items-start sm:items-center gap-2">
             <div
               className={`inline-flex items-center gap-1 px-3 py-1 rounded-full border border-green-200 ${priorityConfig[priority].bg}`}
             >
