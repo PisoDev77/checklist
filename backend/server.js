@@ -23,7 +23,7 @@ mongoose
 const checkItemRoutes = require('./routes/checkItems');
 const quizRoutes = require('./routes/quizs');
 app.use('/api/checkItems', checkItemRoutes);
-app.use('/api/checkItems', quizRoutes);
+app.use('/api/quizs', quizRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

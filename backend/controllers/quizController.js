@@ -74,3 +74,15 @@ exports.getQuizsByCategory = async (req, res) => {
 		res.status(500).json({ message: error.message });
 	}
 };
+
+exports.getQuizsByWrongCounts = async (req, res) => {
+	try {
+		const quizs = await Quiz.find({
+			category: req.params.category,
+			wrongCount: { $gte: 1 },
+		}).sort({ wrongCount: -1, recentUpdateDate: -1 });
+		res.json(quizs);
+	} catch (error) {
+		res.status(500).json({ message: error.message });
+	}
+};

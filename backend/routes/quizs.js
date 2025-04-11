@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const quizController = require('../controllers/quizController');
-const Quiz = require('../models/quiz');
+const Quiz = require('../models/Quiz');
 
 // 기본 CRUD 라우트
 router.post('/', async (req, res) => {
