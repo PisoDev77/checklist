@@ -37,6 +37,14 @@ router.post('/', async (req, res) => {
 	}
 });
 
+// 카테고리 목록 조회
+router.get('/categories', quizController.getCategories);
+
+// 추가 라우트
+router.get('/wrongs', quizController.getQuizsByWrongCounts);
+router.get('/category/:category', quizController.getQuizsByCategory);
+
+// 기본 CRUD 라우트 (계속)
 router.get('/:id', quizController.getQuiz);
 router.put('/:id', async (req, res) => {
 	try {
@@ -48,9 +56,5 @@ router.put('/:id', async (req, res) => {
 	}
 });
 router.delete('/:id', quizController.deleteQuiz);
-router.get('/category/:category', quizController.getQuizsByCategory);
-
-// 추가 라우트
-router.get('/wrongs', quizController.getQuizsByWrongCounts);
 
 module.exports = router;

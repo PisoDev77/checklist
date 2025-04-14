@@ -64,11 +64,11 @@ exports.deleteQuiz = async (req, res) => {
 	}
 };
 
+// 카테고리별 퀴즈 조회
 exports.getQuizsByCategory = async (req, res) => {
 	try {
-		const quizs = await Quiz.find({
-			category: req.params.category,
-		}).sort({ recentUpdateDate: -1 });
+		const category = decodeURIComponent(req.params.category);
+		const quizs = await Quiz.find({ category }).sort({ recentUpdateDate: -1 });
 		res.json(quizs);
 	} catch (error) {
 		res.status(500).json({ message: error.message });
@@ -78,7 +78,6 @@ exports.getQuizsByCategory = async (req, res) => {
 exports.getQuizsByWrongCounts = async (req, res) => {
 	try {
 		const quizs = await Quiz.find({
-			category: req.params.category,
 			wrongCount: { $gte: 1 },
 		}).sort({ wrongCount: -1, recentUpdateDate: -1 });
 		res.json(quizs);
@@ -86,3 +85,17 @@ exports.getQuizsByWrongCounts = async (req, res) => {
 		res.status(500).json({ message: error.message });
 	}
 };
+
+// 카테고리 목록 조회
+exports.getCategories = async (req, res) => {
+	try {
+		const categories = await Quiz.find().distinct('category');
+		console.log(categories);
+		res.json(categories);
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ message: error.message });
+	}
+};
+
+module.exports = exports;
